@@ -1,0 +1,30 @@
+const { useState } = React;
+
+const randomD6 = () => Math.floor(Math.random() * 6) + 1;
+
+const App = () => {
+  const [diceRoll, setDiceRoll] = useState(randomD6());
+
+  return (
+    <div className="h-screen bg-gray-200 p-6">
+      <h1 className="text-3xl leading-9 tracking-tight">Webinar - useState</h1>
+      <p className="text-xl leading-7 py-6">
+        Hai tirato un <strong>{diceRoll}</strong>!
+      </p>
+      <button
+        className="bg-indigo-500 font-bold rounded-full mr-2 py-4 px-8 shadow-lg uppercase tracking-wider text-white focus:outline-none"
+        onClick={() => setDiceRoll(randomD6())}
+      >
+        Roll
+      </button>
+      <button
+        className="bg-indigo-500 font-bold rounded-full py-4 px-10 shadow-lg uppercase tracking-wider text-white focus:outline-none"
+        onClick={() => setDiceRoll((prev) => 7 - prev)}
+      >
+        Flip
+      </button>
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById("app"));

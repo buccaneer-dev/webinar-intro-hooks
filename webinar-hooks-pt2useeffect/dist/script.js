@@ -1,0 +1,88 @@
+const { useState, useEffect } = React;
+
+// fetch data every 1 hour
+const POLLING_INTERVAL = 1 * 60 * 60 * 1000;
+const API_URL = "https://hacker-news.firebaseio.com/v0/";
+const DEFAULT = 5;
+const MAX = 20;
+
+const fetchStories = (n) =>
+fetch(API_URL + "topstories.json").
+then(resp => resp.json()).
+then((ids) =>
+Promise.all(
+ids.slice(0, n).map(id => fetch(API_URL + "item/" + id + ".json")))).
+
+
+then(articles => Promise.all(articles.map(r => r.json()))).
+then((jsons) =>
+jsons.map(json => ({ title: json.title, url: json.url })));
+
+
+const App = () => {
+  const [stories, setStories] = useState([]);
+  // esempio 2
+  const [number, setNumber] = useState(DEFAULT);
+
+  /*  esempio 1 */
+  /*
+  useEffect(() => {
+    fetchStories(DEFAULT)
+     .then(elems => setStories(elems));
+  }, []);
+  */
+  /*  esempio 2 */
+  /*
+  useEffect(() => {
+    fetchStories(number).then((elems) => setStories(elems));
+  }, [number]);
+  */
+  /*  esempio 3 */
+
+  useEffect(() => {
+    const fetchData = () =>
+    fetchStories(number).then(elems => setStories(elems));
+    fetchData();
+
+    const timer = window.setInterval(fetchData, POLLING_INTERVAL);
+    return () => window.clearInterval(timer);
+  }, [number]);
+
+  return /*#__PURE__*/(
+    React.createElement("div", { className: "h-screen bg-gray-200 p-6" }, /*#__PURE__*/
+    React.createElement("h1", { className: "text-3xl leading-9 tracking-tight" }, "Webinar - useEffect"), /*#__PURE__*/
+    React.createElement("p", { className: "text-xl leading-7 py-1 mb-8" }, "Hacker News Top Stories"), /*#__PURE__*/
+
+    React.createElement("input", {
+      id: "link-checkbox",
+      type: "checkbox",
+      value: "",
+      class: "mb-8 w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
+      onClick: () => setNumber(number === DEFAULT ? MAX : DEFAULT) }), /*#__PURE__*/
+
+    React.createElement("label", {
+      for: "link-checkbox",
+      class: "ml-2 text-sm font-medium text-gray-900 dark:text-gray-300" }, "Show top 20"), /*#__PURE__*/
+
+
+
+
+    React.createElement("div", { className: "list-disc max-w-lg py-4 px-8 bg-white shadow-lg rounded-lg my-20" },
+    stories.map((story, i) => /*#__PURE__*/
+    React.createElement("li", null, /*#__PURE__*/
+    React.createElement("a", {
+      key: i,
+      href: story.url,
+      target: "_blank",
+      className: "underline hover:no-underline text-blue-600 hover:text-blue-800 visited:text-purple-600 mr-8" },
+
+    story.title))))));
+
+
+
+
+
+
+};
+
+ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById("app"));
